@@ -1,1 +1,4 @@
 .DS_Store
+
+# Build output - regenerate with "bun build.js"
+build/

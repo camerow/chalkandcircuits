@@ -1,7 +1,10 @@
-// Local preview: bun serve.js
+// Local preview: bun serve.js          serves the repository
+//                bun serve.js build    serves the upload directory
 // Opening index.html over file:// is not equivalent - Chrome gives file://
 // documents an opaque origin and refuses to load the fonts.
-const root = import.meta.dir;
+import { resolve } from "node:path";
+
+const root = resolve(import.meta.dir, process.argv[2] ?? ".");
 const port = Number(process.env.PORT) || 8731;
 
 Bun.serve({
@@ -16,4 +19,4 @@ Bun.serve({
   },
 });
 
-console.log(`Chalk & Circuits on http://localhost:${port}`);
+console.log(`Serving ${root} on http://localhost:${port}`);

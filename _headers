@@ -1,0 +1,12 @@
+# Asset filenames are stable rather than content-hashed, so they get a bounded
+# cache instead of immutable: a replaced font or screenshot still has to reach
+# visitors, and a month is the longest wait worth accepting for that.
+/assets/*
+  Cache-Control: public, max-age=2592000
+
+# The document names every asset, so it has to revalidate on each visit or a
+# deploy would never reach anyone holding a cached copy.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
