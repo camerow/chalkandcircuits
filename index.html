@@ -260,6 +260,7 @@ body{background:#F8F5EB;color:#2C2F45;font-family:'Schibsted Grotesk','Helvetica
 a{color:#3D405B}a:hover{text-decoration:none}
 .wrap{max-width:1280px;margin:0 auto;padding:0 clamp(1.25rem,5vw,4rem)}
 header{position:sticky;top:0;z-index:10;height:66px;display:flex;align-items:center;background:rgba(248,245,235,.86);backdrop-filter:blur(12px);border-bottom:1px solid rgba(61,64,91,.10)}
+header svg{width:min(200px,52vw);height:auto;display:block}
 header .wrap{width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .mono{font-family:'Geist Mono',ui-monospace,monospace;font-size:.8125rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#7B7E9A}
 .eyebrow{display:flex;align-items:center;gap:10px}
@@ -278,10 +279,18 @@ header .wrap{width:100%;display:flex;align-items:center;justify-content:space-be
 .stores a{text-decoration:none;padding:8px 15px;border-radius:10px;color:#fff;border:1px solid rgba(238,211,248,.35)}
 .stores a.pri{color:#403F4C;background:#F9DC5C;border-color:#F9DC5C}
 .show{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:clamp(2rem,5vw,5rem);align-items:start}
-@media (max-width:720px){.show{grid-template-columns:minmax(0,1fr)}.phone{max-width:300px}}
+.row-shot{display:none}
+@media (max-width:720px){
+  .show{grid-template-columns:minmax(0,1fr)}
+  .phone{display:none}
+  .row-shot{display:block;margin-top:1.25rem;width:min(240px,64vw);aspect-ratio:9/14;overflow:hidden;border:1px solid rgba(238,211,248,.25);border-radius:16px;background:#35343F;box-shadow:0 18px 44px rgba(20,19,26,.38)}
+  .row-shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+}
 .row{border-top:1px solid rgba(238,211,248,.18);padding:1.5rem 0;display:grid;gap:.5rem}
 .row .num{display:flex;align-items:center;gap:11px;color:rgba(238,211,248,.6)}
 .row .num::before{content:"";width:8px;height:8px;border-radius:2px;background:rgba(238,211,248,.25)}
+.row-toggle{display:grid;gap:.5rem;width:100%;padding:0;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.row-toggle:focus-visible{outline:2px solid #F9DC5C;outline-offset:6px;border-radius:6px}
 .row .title{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:1.75rem;font-weight:700;letter-spacing:-.03em;line-height:1.05;color:#fff}
 .row .body{display:grid;overflow:hidden;grid-template-rows:0fr;opacity:0}
 .row .body span{min-height:0;max-width:52ch;font-size:1rem;line-height:1.55;color:rgba(238,211,248,.88)}
@@ -294,15 +303,28 @@ header .wrap{width:100%;display:flex;align-items:center;justify-content:space-be
 .row .num{animation-name:numOn}
 .row .num::before{animation:dotOn 26s infinite cubic-bezier(.2,.7,.2,1);animation-delay:inherit}
 .shot{animation-name:showShot}
-.i1{animation-delay:0s}.i2{animation-delay:-5.2s}.i3{animation-delay:-10.4s}.i4{animation-delay:-15.6s}.i5{animation-delay:-20.8s}
+.i1{animation-delay:0s}.i2{animation-delay:-20.8s}.i3{animation-delay:-15.6s}.i4{animation-delay:-10.4s}.i5{animation-delay:-5.2s}
 @keyframes openRow{0%,20%{grid-template-rows:1fr;opacity:1}21.4%,98.6%{grid-template-rows:0fr;opacity:0}100%{grid-template-rows:1fr;opacity:1}}
 @keyframes numOn{0%,20%{color:#F9DC5C}21.4%,98.6%{color:rgba(238,211,248,.6)}100%{color:#F9DC5C}}
 @keyframes dotOn{0%,20%{background:#E84855}21.4%,98.6%{background:rgba(238,211,248,.25)}100%{background:#E84855}}
 @keyframes showShot{0%,20%{opacity:1;transform:scale(1)}22.2%,97.8%{opacity:0;transform:scale(.88)}100%{opacity:1;transform:scale(1)}}
+.show.is-interactive .row .body,
+.show.is-interactive .row .num,
+.show.is-interactive .row .num::before,
+.show.is-interactive .shot{animation:none}
+.show.is-interactive .row .body{grid-template-rows:0fr;opacity:0;transition:grid-template-rows .45s cubic-bezier(.2,.7,.2,1),opacity .45s cubic-bezier(.2,.7,.2,1)}
+.show.is-interactive .row.is-open .body{grid-template-rows:1fr;opacity:1}
+.show.is-interactive .row .num{color:rgba(238,211,248,.6)}
+.show.is-interactive .row.is-open .num{color:#F9DC5C}
+.show.is-interactive .row .num::before{background:rgba(238,211,248,.25)}
+.show.is-interactive .row.is-open .num::before{background:#E84855}
+.show.is-interactive .shot{opacity:0;transform:scale(.88);transition:opacity .45s cubic-bezier(.2,.7,.2,1),transform .45s cubic-bezier(.2,.7,.2,1)}
+.show.is-interactive .shot.is-open{opacity:1;transform:scale(1)}
 @media (prefers-reduced-motion:reduce){
   .row .body,.row .num,.row .num::before,.shot{animation:none}
-  .row .body{grid-template-rows:1fr;opacity:1}
-  .shot.i1{opacity:1;transform:none}
+  .show:not(.is-interactive) .row .body{grid-template-rows:1fr;opacity:1}
+  .show:not(.is-interactive) .shot.i1{opacity:1;transform:none}
+  .show.is-interactive .row .body,.show.is-interactive .shot{transition:none}
 }
 .feat{margin-top:5rem;background:#F7F6F3;border-radius:20px;padding:clamp(1.5rem,4vw,3rem);display:grid;gap:1.5rem}
 .feat h3{margin:0;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:clamp(1.75rem,3vw,2.25rem);font-weight:700;letter-spacing:-.03em;line-height:1.05;color:#403F4C}
@@ -317,7 +339,7 @@ footer .meta{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
 </head>
 <body>
 <header><div class="wrap">
-<svg viewBox="0 0 300 48" width="150" height="24" role="img" aria-label="Chalk &amp; Circuits"><g transform="translate(0 3) scale(.875)" fill="none" stroke-linecap="round" stroke-width="3.9"><path d="M36.73 11.27A18 18 0 1 0 36.73 36.73" stroke="#3D405B"></path><path d="M29.45 16.22A9.5 9.5 0 1 0 29.45 31.78" stroke="#E07A5F"></path></g><rect x="22.4" y="22.4" width="3.2" height="3.2" rx=".6" fill="#3D405B"></rect><text x="57" y="33" fill="#3D405B" font-family="'Schibsted Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif" font-weight="600" font-size="26.5" letter-spacing="-.7">Chalk <tspan fill="#E07A5F">&amp;</tspan> Circuits</text></svg>
+<svg viewBox="0 0 300 48" width="200" height="32" role="img" aria-label="Chalk &amp; Circuits"><g transform="translate(0 3) scale(.875)" fill="none" stroke-linecap="round" stroke-width="3.9"><path d="M36.73 11.27A18 18 0 1 0 36.73 36.73" stroke="#3D405B"></path><path d="M29.45 16.22A9.5 9.5 0 1 0 29.45 31.78" stroke="#E07A5F"></path></g><rect x="22.4" y="22.4" width="3.2" height="3.2" rx=".6" fill="#3D405B"></rect><text x="57" y="33" fill="#3D405B" font-family="'Schibsted Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif" font-weight="600" font-size="26.5" letter-spacing="-.7">Chalk <tspan fill="#E07A5F">&amp;</tspan> Circuits</text></svg>
 </div></header>
 
 <main class="wrap">
@@ -345,11 +367,11 @@ footer .meta{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
 
 <div class="show">
 <div>
-<div class="row"><span class="pm num i1">01</span><span class="title">Easy session logging</span><div class="body i1"><span>Date, times, indoor or outdoor, and the climbs. V-scale or Font grades, sends and attempts, tries. About a minute, right after you climb.</span></div></div>
-<div class="row"><span class="pm num i2">02</span><span class="title">Session RPE for effort tracking</span><div class="body i2"><span>Every session is scored 1 to 10 against your own last eight weeks, so a big night reads as a big night. Not just a list of grades.</span></div></div>
-<div class="row"><span class="pm num i3">03</span><span class="title">Long term trends</span><div class="body i3"><span>Volume, grade pyramid, hardest send, flash rate and average grade, week by week. If you have been stuck at V5 since March, the chart says V5 since March.</span></div></div>
-<div class="row"><span class="pm num i4">04</span><span class="title">Sort and filter by tag</span><div class="body i4"><span>Tag sessions and climbs however you like, then sort and filter the log and the trends by them. Indoor, outdoor, a board, a project, a gym.</span></div></div>
-<div class="row"><span class="pm num i5">05</span><span class="title">Sync on Strava</span><div class="body i5"><span>Each logged session becomes one Rock Climbing activity with duration, sends, attempts and grades filled in. Strava sync is never paywalled.</span></div></div>
+<div class="row"><span class="pm num i1">01</span><span class="title">Easy session logging</span><div class="body i1"><span>Date, times, indoor or outdoor, and the climbs. V-scale or Font grades, sends and attempts, tries. About a minute, right after you climb.<span class="row-shot"><img src="assets/img/log-a-session.png" alt="Log a session" loading="lazy" decoding="async"></span></span></div></div>
+<div class="row"><span class="pm num i2">02</span><span class="title">Session RPE for effort tracking</span><div class="body i2"><span>Every session is scored 1 to 10 against your own last eight weeks, so a big night reads as a big night. Not just a list of grades.<span class="row-shot"><img src="assets/img/session-breakdown.png" alt="Session breakdown" loading="lazy" decoding="async"></span></span></div></div>
+<div class="row"><span class="pm num i3">03</span><span class="title">Long term trends</span><div class="body i3"><span>Volume, grade pyramid, hardest send, flash rate and average grade, week by week. If you have been stuck at V5 since March, the chart says V5 since March.<span class="row-shot"><img src="assets/img/trends.png" alt="Trends" loading="lazy" decoding="async"></span></span></div></div>
+<div class="row"><span class="pm num i4">04</span><span class="title">Sort and filter by tag</span><div class="body i4"><span>Tag sessions and climbs however you like, then sort and filter the log and the trends by them. Indoor, outdoor, a board, a project, a gym.<span class="row-shot"><img src="assets/img/filter-by-tag.png" alt="Filter by tag" loading="lazy" decoding="async"></span></span></div></div>
+<div class="row"><span class="pm num i5">05</span><span class="title">Sync on Strava</span><div class="body i5"><span>Each logged session becomes one Rock Climbing activity with duration, sends, attempts and grades filled in. Strava sync is never paywalled.<span class="row-shot"><img src="assets/img/view-on-strava.png" alt="View on Strava" loading="lazy" decoding="async"></span></span></div></div>
 </div>
 <div class="phone">
 <div class="shot i1"><img src="assets/img/log-a-session.png" alt="Log a session"></div>
@@ -380,4 +402,65 @@ footer .meta{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
 </div></footer>
 
 
+<script>
+// Progressive enhancement for the feature list. Without this the rows run a
+// 26s CSS loop on their own; with it each heading becomes a button that
+// selects its feature, and the loop stops for good on the first choice - a
+// carousel that keeps moving under someone who just picked an item is the
+// thing worth fixing.
+(() => {
+  const show = document.querySelector(".show");
+  if (!show) return;
+
+  const rows = [...show.querySelectorAll(".row")];
+  const shots = [...show.querySelectorAll(".shot")];
+  if (rows.length === 0) return;
+
+  const buttons = rows.map((row, i) => {
+    const body = row.querySelector(".body");
+    const num = row.querySelector(".num");
+    const title = row.querySelector(".title");
+    if (!body || !num || !title) return null;
+
+    body.id = `feature-${i + 1}`;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "row-toggle";
+    button.setAttribute("aria-controls", body.id);
+    button.setAttribute("aria-expanded", "false");
+    // Number and title move inside, so the whole heading is the target
+    // rather than a separate control sitting next to it.
+    button.append(num, title);
+    row.prepend(button);
+    return button;
+  });
+
+  if (buttons.some((button) => button === null)) return;
+
+  const openFeature = (index) => {
+    show.classList.add("is-interactive");
+    rows.forEach((row, i) => row.classList.toggle("is-open", i === index));
+    shots.forEach((shot, i) => shot.classList.toggle("is-open", i === index));
+    buttons.forEach((button, i) => {
+      button.setAttribute("aria-expanded", String(i === index));
+    });
+  };
+
+  buttons.forEach((button, i) => {
+    button.addEventListener("click", () => openFeature(i));
+    button.addEventListener("keydown", (event) => {
+      const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[event.key];
+      if (step === undefined) return;
+      event.preventDefault();
+      const next = (i + step + buttons.length) % buttons.length;
+      buttons[next].focus();
+      openFeature(next);
+    });
+  });
+
+  // With motion reduced there is no auto-advance to wait for, and the CSS
+  // fallback leaves every row open at once. Take over immediately instead.
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) openFeature(0);
+})();
+</script>
 </body></html>
