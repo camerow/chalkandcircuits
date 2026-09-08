@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Chalk &amp; Circuits">
+  <rect width="48" height="48" rx="11" fill="#F8F5EB"/>
+  <g fill="none" stroke-width="3.6" stroke-linecap="round">
+    <path d="M34.96 13.04A15.5 15.5 0 1 0 34.96 34.96" stroke="#3D405B"/>
+    <path d="M29.8 18.2A8.2 8.2 0 1 0 29.8 29.8" stroke="#E07A5F"/>
+  </g>
+  <rect x="22.5" y="22.5" width="3" height="3" rx=".6" fill="#3D405B"/>
+</svg>
