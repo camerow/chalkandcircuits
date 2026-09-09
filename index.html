@@ -280,12 +280,6 @@ header .wrap{width:100%;display:flex;align-items:center;justify-content:space-be
 .stores a.pri{color:#403F4C;background:#F9DC5C;border-color:#F9DC5C}
 .show{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:clamp(2rem,5vw,5rem);align-items:start}
 .row-shot{display:none}
-@media (max-width:720px){
-  .show{grid-template-columns:minmax(0,1fr)}
-  .phone{display:none}
-  .row-shot{display:block;margin-top:1.25rem;width:min(240px,64vw);aspect-ratio:9/14;overflow:hidden;border:1px solid rgba(238,211,248,.25);border-radius:16px;background:#35343F;box-shadow:0 18px 44px rgba(20,19,26,.38)}
-  .row-shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
-}
 .row{border-top:1px solid rgba(238,211,248,.18);padding:1.5rem 0;display:grid;gap:.5rem}
 .row .num{display:flex;align-items:center;gap:11px;color:rgba(238,211,248,.6)}
 .row .num::before{content:"";width:8px;height:8px;border-radius:2px;background:rgba(238,211,248,.25)}
@@ -325,6 +319,20 @@ header .wrap{width:100%;display:flex;align-items:center;justify-content:space-be
   .show:not(.is-interactive) .row .body{grid-template-rows:1fr;opacity:1}
   .show:not(.is-interactive) .shot.i1{opacity:1;transform:none}
   .show.is-interactive .row .body,.show.is-interactive .shot{transition:none}
+}
+/* Narrow screens get a different design rather than a squeezed one. The
+   disclosure exists to feed the single phone beside the list; stacked, there
+   is no panel to feed, and collapsing would hide four of the five screenshots
+   behind taps. So nothing collapses, nothing advances, and every feature
+   carries its own shot. */
+@media (max-width:720px){
+  .show{grid-template-columns:minmax(0,1fr)}
+  .phone{display:none}
+  .row .body,.row .num,.row .num::before,.shot{animation:none}
+  .show .row .body,
+  .show.is-interactive .row .body{grid-template-rows:1fr;opacity:1;transition:none}
+  .row-shot{display:block;margin-top:1.25rem;width:min(240px,64vw);aspect-ratio:9/12;overflow:hidden;border:1px solid rgba(238,211,248,.25);border-radius:16px;background:#35343F;box-shadow:0 18px 44px rgba(20,19,26,.38)}
+  .row-shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
 }
 .feat{margin-top:5rem;background:#F7F6F3;border-radius:20px;padding:clamp(1.5rem,4vw,3rem);display:grid;gap:1.5rem}
 .feat h3{margin:0;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:clamp(1.75rem,3vw,2.25rem);font-weight:700;letter-spacing:-.03em;line-height:1.05;color:#403F4C}
@@ -403,11 +411,13 @@ footer .meta{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
 
 
 <script>
-// Progressive enhancement for the feature list. Without this the rows run a
-// 26s CSS loop on their own; with it each heading becomes a button that
-// selects its feature, and the loop stops for good on the first choice - a
-// carousel that keeps moving under someone who just picked an item is the
-// thing worth fixing.
+// Progressive enhancement for the feature list, and only where it means
+// something. Above 720px the list sits beside one phone, so disclosing a
+// feature is what points the phone at it; each heading becomes a button, and
+// the first choice stops the 26s loop for good. Below that the layout stacks,
+// every feature already shows its own screenshot, and there is nothing left to
+// disclose - so no buttons are built, and a viewport that crosses the boundary
+// gains or loses them.
 (() => {
   const show = document.querySelector(".show");
   if (!show) return;
@@ -416,28 +426,15 @@ footer .meta{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
   const shots = [...show.querySelectorAll(".shot")];
   if (rows.length === 0) return;
 
-  const buttons = rows.map((row, i) => {
-    const body = row.querySelector(".body");
-    const num = row.querySelector(".num");
-    const title = row.querySelector(".title");
-    if (!body || !num || !title) return null;
-
-    body.id = `feature-${i + 1}`;
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "row-toggle";
-    button.setAttribute("aria-controls", body.id);
-    button.setAttribute("aria-expanded", "false");
-    // Number and title move inside, so the whole heading is the target
-    // rather than a separate control sitting next to it.
-    button.append(num, title);
-    row.prepend(button);
-    return button;
-  });
-
-  if (buttons.some((button) => button === null)) return;
+  const beside = matchMedia("(min-width: 721px)");
+  let buttons = [];
 
   const openFeature = (index) => {
+    // Belt and braces. Selecting a feature hides the other four, which is the
+    // right trade beside the phone and the wrong one stacked, where hiding
+    // them takes four screenshots off the page. If a button ever outlives the
+    // width it was built for, it does nothing rather than something harmful.
+    if (!beside.matches) return;
     show.classList.add("is-interactive");
     rows.forEach((row, i) => row.classList.toggle("is-open", i === index));
     shots.forEach((shot, i) => shot.classList.toggle("is-open", i === index));
@@ -446,21 +443,51 @@ footer .meta{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
     });
   };
 
-  buttons.forEach((button, i) => {
-    button.addEventListener("click", () => openFeature(i));
-    button.addEventListener("keydown", (event) => {
-      const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[event.key];
-      if (step === undefined) return;
-      event.preventDefault();
-      const next = (i + step + buttons.length) % buttons.length;
-      buttons[next].focus();
-      openFeature(next);
+  const enhance = () => {
+    buttons = rows.map((row, i) => {
+      const body = row.querySelector(".body");
+      const button = document.createElement("button");
+      body.id = `feature-${i + 1}`;
+      button.type = "button";
+      button.className = "row-toggle";
+      button.setAttribute("aria-controls", body.id);
+      button.setAttribute("aria-expanded", "false");
+      // Number and title move inside, so the whole heading is the target
+      // rather than a separate control sitting next to it.
+      button.append(row.querySelector(".num"), row.querySelector(".title"));
+      row.prepend(button);
+      button.addEventListener("click", () => openFeature(i));
+      button.addEventListener("keydown", (event) => {
+        const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[event.key];
+        if (step === undefined) return;
+        event.preventDefault();
+        const nextIndex = (i + step + buttons.length) % buttons.length;
+        buttons[nextIndex].focus();
+        openFeature(nextIndex);
+      });
+      return button;
     });
-  });
+    // With motion reduced there is no auto-advance to wait for, and the CSS
+    // fallback leaves every row open at once. Take over immediately instead.
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) openFeature(0);
+  };
 
-  // With motion reduced there is no auto-advance to wait for, and the CSS
-  // fallback leaves every row open at once. Take over immediately instead.
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) openFeature(0);
+  const revert = () => {
+    // Unwrap rather than rebuild: the heading spans go back where they were.
+    buttons.forEach((button) => button.replaceWith(...button.childNodes));
+    buttons = [];
+    show.classList.remove("is-interactive");
+    rows.forEach((row) => row.classList.remove("is-open"));
+    shots.forEach((shot) => shot.classList.remove("is-open"));
+  };
+
+  const sync = () => {
+    if (beside.matches && buttons.length === 0) enhance();
+    else if (!beside.matches && buttons.length > 0) revert();
+  };
+
+  sync();
+  beside.addEventListener("change", sync);
 })();
 </script>
 </body></html>
