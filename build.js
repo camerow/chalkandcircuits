@@ -1,9 +1,11 @@
 // Produces build/ - the exact set of files to upload, and nothing else.
-// Run with: bun build.js
+// Run with: bun build.js   (node build.js works too, so a deploy host does
+// not have to provide Bun)
 import { cp, rm, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = import.meta.dir;
+const root = dirname(fileURLToPath(import.meta.url));
 const out = join(root, "build");
 
 // An allowlist rather than a denylist: a new file in the repository root is
