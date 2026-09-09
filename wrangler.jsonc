@@ -1,0 +1,11 @@
+{
+  // Must match the Worker created in the dashboard, or the deploy lands on a
+  // different one.
+  "name": "chalkandcircuits",
+  "compatibility_date": "2026-09-08",
+
+  // An assets-only Worker: no server script, just the directory build.js
+  // produces. Cloudflare reads _headers from inside it, so the cache policy
+  // ships with the site.
+  "assets": { "directory": "./build" }
+}
